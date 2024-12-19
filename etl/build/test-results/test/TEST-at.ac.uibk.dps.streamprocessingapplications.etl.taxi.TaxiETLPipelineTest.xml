@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="at.ac.uibk.dps.streamprocessingapplications.etl.taxi.TaxiETLPipelineTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-05-06T07:38:58" hostname="master-node" time="2.084">
+  <properties/>
+  <testcase name="integrationTest()" classname="at.ac.uibk.dps.streamprocessingapplications.etl.taxi.TaxiETLPipelineTest" time="2.084"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

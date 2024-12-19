@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="at.ac.uibk.dps.streamprocessingapplications.etl.taxi.AnnotationFunctionTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-05-06T07:38:58" hostname="master-node" time="0.053">
+  <properties/>
+  <testcase name="apply()" classname="at.ac.uibk.dps.streamprocessingapplications.etl.taxi.AnnotationFunctionTest" time="0.053"/>
+  <system-out><![CDATA[[{"u":"string","n":"taxi_identifier"},{"u":"string","n":"hack_license"},{"u":"time","n":"hack_license"},{"u":"s","n":"trip_time_in_secs"},{"u":"m","n":"trip_distance"},{"u":"deg","n":"pickup_longitude"},{"u":"deg","n":"pickup_latitude"},{"u":"deg","n":"dropoff_longitude"},{"u":"deg","n":"dropoff_latitude"},{"u":"payment_type","n":"payment_type"},{"u":"dollar","n":"fare_amount"},{"u":"%","n":"surcharge"},{"u":"%","n":"mta_tax"},{"u":"dollar","n":"tip_amount"},{"u":"dollar","n":"tolls_amount"},{"u":"dollar","n":"total_amount"},{"u":"string","vs":"c2","n":"taxi_company"},{"u":"string","vs":"n2","n":"driver_name"},{"u":"string","vs":"cty4","n":"taxi_city"}]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

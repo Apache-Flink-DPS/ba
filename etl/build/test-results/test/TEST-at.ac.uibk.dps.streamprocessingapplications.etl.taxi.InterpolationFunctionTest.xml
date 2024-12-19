@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="at.ac.uibk.dps.streamprocessingapplications.etl.taxi.InterpolationFunctionTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-05-06T07:38:58" hostname="master-node" time="0.013">
+  <properties/>
+  <testcase name="apply()" classname="at.ac.uibk.dps.streamprocessingapplications.etl.taxi.InterpolationFunctionTest" time="0.013"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
