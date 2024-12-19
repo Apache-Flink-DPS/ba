@@ -48,7 +48,7 @@ public class STATSPipeline<T> extends PTransform<PCollection<String>, PDone> {
 
     PDone kalmanAndPredict =
         parsedObjects
-            .apply(WithKeys.of(UUID.randomUUID()))
+            .apply(WithKeys.of(String.valueOf(UUID.randomUUID())))
             .apply("KalmanFilter", ParDo.of(this.kalmanFilterFunction))
             .apply("SlidingLinearReg", ParDo.of(this.slidingLinearRegressionFunction))
             .apply(Values.create())
