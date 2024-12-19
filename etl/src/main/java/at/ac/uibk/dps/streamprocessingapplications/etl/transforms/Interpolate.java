@@ -26,7 +26,7 @@ public class Interpolate<T> extends PTransform<PCollection<T>, PCollection<T>> {
      * Therefore, a pseudo mapping to the same key is performed.
      */
     return input
-        .apply(WithKeys.of(""))
+        .apply(WithKeys.of((T element) -> String.valueOf(element.hashCode())))
         .apply(GroupIntoBatches.ofSize(this.batchSize))
         .apply(Values.create())
         .apply(FlatMapElements.into(type).via(this.interpolationFunction::apply));
