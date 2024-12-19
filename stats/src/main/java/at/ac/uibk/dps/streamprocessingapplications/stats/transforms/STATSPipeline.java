@@ -3,6 +3,8 @@ package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.StoreStringInDBSink;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.*;
 
@@ -47,7 +49,7 @@ public class STATSPipeline<T> extends PTransform<PCollection<String>, PDone> {
 
     PDone kalmanAndPredict =
         parsedObjects
-            .apply(WithKeys.of(""))
+            .apply(WithKeys.of(UUID.randomUUID()))
             .apply("KalmanFilter", ParDo.of(this.kalmanFilterFunction))
             .apply("SlidingLinearReg", ParDo.of(this.slidingLinearRegressionFunction))
             .apply(Values.create())
