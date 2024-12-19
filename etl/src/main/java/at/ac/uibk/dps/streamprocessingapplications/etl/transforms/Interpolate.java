@@ -1,5 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl.transforms;
 
+import java.util.UUID;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.transforms.windowing.*;
 import org.apache.beam.sdk.values.PCollection;
@@ -26,7 +27,7 @@ public class Interpolate<T> extends PTransform<PCollection<T>, PCollection<T>> {
      * Therefore, a pseudo mapping to the same key is performed.
      */
     return input
-        .apply(WithKeys.of((T element) -> String.valueOf(element.hashCode())))
+        .apply(WithKeys.of(UUID.randomUUID().toString()))
         .apply(GroupIntoBatches.ofSize(this.batchSize))
         .apply(Values.create())
         .apply(FlatMapElements.into(type).via(this.interpolationFunction::apply));
