@@ -4,7 +4,6 @@ import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.StoreStringInDBS
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.*;
 
