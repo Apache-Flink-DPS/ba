@@ -26,26 +26,24 @@ public class Average<T, Double> extends PTransform<PCollection<T>, PCollection<D
      */
     return input
         .apply(
-            "BufferElements",
+            "BatchAvg",
             ParDo.of(
                 new DoFn<T, Iterable<T>>() {
                   private List<T> buffer = new ArrayList<>();
                   private int currentSize = 0;
-                  private final int batchSize = 100; // You can set this dynamically if needed
+                  private final int batchSize = Average.this.batchSize;
 
                   @ProcessElement
                   public void processElement(ProcessContext c) {
                     buffer.add(c.element());
                     currentSize++;
-
-                    // Once we reach the batch size, output the buffer
                     if (currentSize >= batchSize) {
-                      c.output(buffer); // Pass the batch of elements as an Iterable
-                      buffer.clear(); // Reset the buffer
+                      c.output(buffer);
+                      buffer.clear();
                       currentSize = 0;
                     }
                   }
                 }))
-        .apply("CalculateAverage", ParDo.of(averagingFunction));
+        .apply("Average", ParDo.of(averagingFunction));
   }
 }

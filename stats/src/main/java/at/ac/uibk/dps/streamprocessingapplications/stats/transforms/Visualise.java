@@ -1,5 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TimestampedValue;
@@ -21,16 +23,26 @@ public class Visualise<T> extends PTransform<PCollection<T>, PCollection<byte[]>
      * Therefore, a pseudo mapping to the same key is performed.
      */
     return input
-        /* NOTE:
-         * Adding timestamps of when the objects arrived at this transform.
-         * Some transforms like `DistinctCount` create new values which will not have a `proper` timestamp.
-         */
+        .apply(new AddTimestamp<>())
         .apply(
-            // NOTE: Using a `DoFn` instead of `MapElement` because of generic type.
-            new AddTimestamp<>())
-        .apply(WithKeys.of(""))
-        .apply(GroupIntoBatches.ofSize(this.batchSize))
-        .apply(Values.create())
-        .apply(ParDo.of(this.plottingFunction));
+            "BatchVisAvg",
+            ParDo.of(
+                new DoFn<TimestampedValue<T>, Iterable<TimestampedValue<T>>>() {
+                  private List<TimestampedValue<T>> buffer = new ArrayList<>();
+                  private int currentSize = 0;
+                  private final int batchSize = Visualise.this.batchSize;
+
+                  @ProcessElement
+                  public void processElement(ProcessContext c) {
+                    buffer.add(c.element());
+                    currentSize++;
+                    if (currentSize >= batchSize) {
+                      c.output(buffer);
+                      buffer.clear();
+                      currentSize = 0;
+                    }
+                  }
+                }))
+        .apply("VisualizeAvg", ParDo.of(plottingFunction));
   }
 }
