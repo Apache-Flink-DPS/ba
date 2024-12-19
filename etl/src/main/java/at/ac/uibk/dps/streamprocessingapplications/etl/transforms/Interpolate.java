@@ -1,6 +1,6 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl.transforms;
 
-import java.util.UUID;
+import java.util.Collections;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.transforms.windowing.*;
 import org.apache.beam.sdk.values.PCollection;
@@ -26,10 +26,19 @@ public class Interpolate<T> extends PTransform<PCollection<T>, PCollection<T>> {
      * `GroupIntoBatches` only supports grouping for key-value pairs.
      * Therefore, a pseudo mapping to the same key is performed.
      */
-    return input
-        .apply(WithKeys.of(UUID.randomUUID().toString()))
-        .apply(GroupIntoBatches.ofSize(this.batchSize))
-        .apply(Values.create())
-        .apply(FlatMapElements.into(type).via(this.interpolationFunction::apply));
+    return input.apply(
+        "Interpolate",
+        ParDo.of(
+            new DoFn<T, T>() {
+              @ProcessElement
+              public void processElement(ProcessContext c) {
+                // Apply interpolation function directly to each element
+                Iterable<T> interpolatedElement =
+                    interpolationFunction.apply(Collections.singleton(c.element()));
+                for (T interpolated : interpolatedElement) {
+                  c.output(interpolated); // Emit each interpolated element
+                }
+              }
+            }));
   }
 }
