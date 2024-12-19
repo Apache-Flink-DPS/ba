@@ -9,9 +9,10 @@ import org.apache.beam.sdk.state.StateSpec;
 import org.apache.beam.sdk.state.StateSpecs;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.SerializableFunction;
+import org.apache.beam.sdk.values.KV;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
-public class SlidingLinearRegression<T> extends DoFn<T, List<Double>> {
+public class SlidingLinearRegression<T> extends DoFn<KV<String, T>, KV<String, List<Double>>> {
   private final int trainWindowSize;
   private final int predictionHorizonSize;
 
@@ -29,11 +30,11 @@ public class SlidingLinearRegression<T> extends DoFn<T, List<Double>> {
 
   @ProcessElement
   public void processElement(
-      @Element T element,
-      OutputReceiver<List<Double>> out,
+      @Element KV<String, T> kvElement,
+      OutputReceiver<KV<String, List<Double>>> out,
       @StateId("previousElements") BagState<Double> previousElements) {
 
-    Double newValue = this.getter.apply(element);
+    Double newValue = this.getter.apply(kvElement.getValue());
     List<Double> pastElements =
         StreamSupport.stream(previousElements.read().spliterator(), false)
             .collect(Collectors.toList());
@@ -59,6 +60,6 @@ public class SlidingLinearRegression<T> extends DoFn<T, List<Double>> {
       predictions.add(regression.predict(pastElements.size() + i));
     }
 
-    out.output(predictions);
+    out.output(KV.of("", predictions));
   }
 }

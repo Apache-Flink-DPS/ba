@@ -16,8 +16,6 @@ import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.STATSPipelin
 import at.ac.uibk.dps.streamprocessingapplications.stats.transforms.SlidingLinearRegression;
 import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.TypeDescriptor;
 
 public class PipelineBuilder {
@@ -26,18 +24,6 @@ public class PipelineBuilder {
 
     pipeline
         .apply(new ReadSenMLSource("senml-cleaned"))
-        .apply(
-            "Loader",
-            ParDo.of(
-                new DoFn<String, String>() {
-                  @ProcessElement
-                  public void processElement(ProcessContext c) {
-                    String element = c.element();
-                    for (int i = 0; i < 15; i++) {
-                      c.output(element);
-                    }
-                  }
-                }))
         .apply(
             new STATSPipeline<>(
                 TypeDescriptor.of(TaxiRide.class),

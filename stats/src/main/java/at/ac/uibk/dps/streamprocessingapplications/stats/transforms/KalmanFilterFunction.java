@@ -7,8 +7,9 @@ import org.apache.beam.sdk.state.ValueState;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.SerializableBiFunction;
 import org.apache.beam.sdk.transforms.SerializableFunction;
+import org.apache.beam.sdk.values.KV;
 
-public class KalmanFilterFunction<T> extends DoFn<T, T> {
+public class KalmanFilterFunction<T> extends DoFn<KV<String, T>, KV<String, T>> {
 
   // INFO: Values were ported from:
   // https://github.com/dream-lab/riot-bench/blob/c86414f7f926ed5ae0fab756bb3d82fbfb6e5bf7/modules/tasks/src/main/resources/tasks_TAXI.properties
@@ -34,10 +35,11 @@ public class KalmanFilterFunction<T> extends DoFn<T, T> {
 
   @ProcessElement
   public void processElement(
-      @Element T element,
-      OutputReceiver<T> out,
+      @Element KV<String, T> kvElement,
+      OutputReceiver<KV<String, T>> out,
       @StateId("previousEstimation") ValueState<Double> previousEstimation,
       @StateId("priorErrorCovariance") ValueState<Double> priorErrorCovariance) {
+    T element = kvElement.getValue();
     final double z_measuredValue = this.getter.apply(element);
 
     // NOTE: conditional override of the values due to `NullPointerException`
@@ -65,6 +67,6 @@ public class KalmanFilterFunction<T> extends DoFn<T, T> {
     previousEstimation.write(x1_currentEstimation);
     priorErrorCovariance.write(p1_currentErrorCovariance);
 
-    out.output(this.setter.apply(element, x1_currentEstimation));
+    out.output(KV.of("", this.setter.apply(element, x1_currentEstimation)));
   }
 }
