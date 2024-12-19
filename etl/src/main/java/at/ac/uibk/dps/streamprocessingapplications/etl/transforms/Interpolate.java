@@ -1,6 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.etl.transforms;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.transforms.windowing.*;
 import org.apache.beam.sdk.values.PCollection;
@@ -26,19 +27,26 @@ public class Interpolate<T> extends PTransform<PCollection<T>, PCollection<T>> {
      * `GroupIntoBatches` only supports grouping for key-value pairs.
      * Therefore, a pseudo mapping to the same key is performed.
      */
-    return input.apply(
-        "Interpolate",
-        ParDo.of(
-            new DoFn<T, T>() {
-              @ProcessElement
-              public void processElement(ProcessContext c) {
-                // Apply interpolation function directly to each element
-                Iterable<T> interpolatedElement =
-                    interpolationFunction.apply(Collections.singleton(c.element()));
-                for (T interpolated : interpolatedElement) {
-                  c.output(interpolated); // Emit each interpolated element
-                }
-              }
-            }));
+    return input
+        .apply(
+            "BatchInterpolate",
+            ParDo.of(
+                new DoFn<T, Iterable<T>>() {
+                  private List<T> buffer = new ArrayList<>();
+                  private int currentSize = 0;
+                  private final int batchSize = Interpolate.this.batchSize;
+
+                  @ProcessElement
+                  public void processElement(ProcessContext c) {
+                    buffer.add(c.element());
+                    currentSize++;
+                    if (currentSize >= batchSize) {
+                      c.output(buffer);
+                      buffer.clear();
+                      currentSize = 0;
+                    }
+                  }
+                }))
+        .apply(FlatMapElements.into(type).via(this.interpolationFunction::apply));
   }
 }
