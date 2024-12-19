@@ -57,6 +57,7 @@ public class STATSPipeline<T> extends PTransform<PCollection<String>, PDone> {
                       public void processElement(ProcessContext c) {
                         int key = count % 2;
                         c.output(KV.of(String.valueOf(key), c.element()));
+                        System.out.println(key);
                         count++;
                       }
                     }))
