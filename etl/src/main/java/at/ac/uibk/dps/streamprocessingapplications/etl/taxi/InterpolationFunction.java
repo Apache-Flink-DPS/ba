@@ -3,8 +3,6 @@ package at.ac.uibk.dps.streamprocessingapplications.etl.taxi;
 import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.apache.beam.sdk.transforms.SerializableFunction;
@@ -12,61 +10,67 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
 public class InterpolationFunction
     implements SerializableFunction<Iterable<TaxiRide>, Iterable<TaxiRide>> {
 
-  public InterpolationFunction() {}
+  private double meanTripTime;
+  private double meanTripDistance;
+  private double meanFareAmount;
+  private double meanTollsAmount;
+  private double meanTotalAmount;
+
+  public InterpolationFunction() {
+    this.meanTripTime = 0;
+    this.meanTripDistance = 0;
+    this.meanFareAmount = 0;
+    this.meanTollsAmount = 0;
+    this.meanTotalAmount = 0;
+  }
 
   @Override
   public Iterable<TaxiRide> apply(Iterable<TaxiRide> taxiRides) {
-    double meanTripTime = calculateMean(taxiRides, TaxiRide::getTripTimeInSecs);
-    double meanTripDistance = calculateMean(taxiRides, TaxiRide::getTripDistance);
-    double meanFareAmount = calculateMean(taxiRides, TaxiRide::getFareAmount);
-    double meanTollsAmount = calculateMean(taxiRides, TaxiRide::getTollsAmount);
-    double meanTotalAmount = calculateMean(taxiRides, TaxiRide::getTotalAmount);
-
+    this.calculateMeans(taxiRides);
     return StreamSupport.stream(taxiRides.spliterator(), false)
-        .map(
-            taxiRide ->
-                interpolate(
-                    taxiRide,
-                    meanTripTime,
-                    meanTripDistance,
-                    meanFareAmount,
-                    meanTollsAmount,
-                    meanTotalAmount))
+        .map(this::interpolate)
         .collect(Collectors.toList());
   }
 
-  private TaxiRide interpolate(
-      TaxiRide taxiRide,
-      double meanTripTime,
-      double meanTripDistance,
-      double meanFareAmount,
-      double meanTollsAmount,
-      double meanTotalAmount) {
+  private TaxiRide interpolate(TaxiRide taxiRide) {
     if (taxiRide.getTripTimeInSecs().isEmpty()) {
-      taxiRide.setTripTimeInSecs(meanTripTime);
+      taxiRide.setTripTimeInSecs(this.meanTripTime);
     }
     if (taxiRide.getTripDistance().isEmpty()) {
-      taxiRide.setTripDistance(meanTripDistance);
+      taxiRide.setTripDistance(this.meanTripDistance);
     }
     if (taxiRide.getFareAmount().isEmpty()) {
-      taxiRide.setFareAmount(meanFareAmount);
+      taxiRide.setFareAmount(this.meanFareAmount);
     }
     if (taxiRide.getTollsAmount().isEmpty()) {
-      taxiRide.setTollsAmount(meanTollsAmount);
+      taxiRide.setTollsAmount(this.meanTollsAmount);
     }
     if (taxiRide.getTotalAmount().isEmpty()) {
-      taxiRide.setTotalAmount(meanTotalAmount);
+      taxiRide.setTotalAmount(this.meanTotalAmount);
     }
 
     return taxiRide;
   }
 
-  private double calculateMean(
-      Iterable<TaxiRide> taxiRides, Function<TaxiRide, Optional<Double>> getter) {
-    Collection<Double> validValues = new ArrayList<>();
+  private void calculateMeans(Iterable<TaxiRide> taxiRides) {
+    Collection<Double> validTripTimes = new ArrayList<>();
+    Collection<Double> validTripDistances = new ArrayList<>();
+    Collection<Double> validFareAmounts = new ArrayList<>();
+    Collection<Double> validTollsAmounts = new ArrayList<>();
+    Collection<Double> validTotalAmounts = new ArrayList<>();
+
     for (TaxiRide taxiRide : taxiRides) {
-      getter.apply(taxiRide).ifPresent(validValues::add);
+      taxiRide.getTripTimeInSecs().ifPresent(validTripTimes::add);
+      taxiRide.getTripDistance().ifPresent(validTripDistances::add);
+      taxiRide.getFareAmount().ifPresent(validFareAmounts::add);
+      taxiRide.getTollsAmount().ifPresent(validTollsAmounts::add);
+      taxiRide.getTotalAmount().ifPresent(validTotalAmounts::add);
     }
-    return validValues.stream().mapToDouble(d -> d).average().orElse(0.0);
+
+    this.meanTripTime = validTripTimes.stream().mapToDouble(d -> d).average().orElse(0.0);
+    this.meanTripDistance = validTripDistances.stream().mapToDouble(d -> d).average().orElse(0.0);
+    this.meanFareAmount = validFareAmounts.stream().mapToDouble(d -> d).average().orElse(0.0);
+    this.meanTollsAmount = validTollsAmounts.stream().mapToDouble(d -> d).average().orElse(0.0);
+    this.meanTotalAmount = validTotalAmounts.stream().mapToDouble(d -> d).average().orElse(0.0);
   }
 }
