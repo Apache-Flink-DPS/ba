@@ -1,9 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 
-import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.StreamSupport;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
 
@@ -26,25 +24,28 @@ public class Average<T, Double> extends PTransform<PCollection<T>, PCollection<D
      * `GroupIntoBatches` only supports grouping for key-value pairs.
      * Therefore, a pseudo mapping to the same key is performed.
      */
-    return input.apply(
-        ParDo.of(
-            new DoFn<T, Double>() {
-              @ProcessElement
-              public void processElement(ProcessContext c) {
-                currentSize += 1;
-                taxiRides.add(c.element());
-                if (currentSize >= batchSize) {
-                  java.lang.Double result =
-                      (java.lang.Double)
-                          StreamSupport.stream(taxiRides.spliterator(), false)
-                              .mapToDouble(
-                                  taxiRide -> ((TaxiRide) taxiRide).getTripDistance().orElse(0.0))
-                              .average()
-                              .orElse(java.lang.Double.NaN);
-                  c.output((Double) result);
-                }
-                currentSize = 0;
-              }
-            }));
+    return input
+        .apply(
+            "BufferElements",
+            ParDo.of(
+                new DoFn<T, Iterable<T>>() {
+                  private List<T> buffer = new ArrayList<>();
+                  private int currentSize = 0;
+                  private final int batchSize = 100; // You can set this dynamically if needed
+
+                  @ProcessElement
+                  public void processElement(ProcessContext c) {
+                    buffer.add(c.element());
+                    currentSize++;
+
+                    // Once we reach the batch size, output the buffer
+                    if (currentSize >= batchSize) {
+                      c.output(buffer); // Pass the batch of elements as an Iterable
+                      buffer.clear(); // Reset the buffer
+                      currentSize = 0;
+                    }
+                  }
+                }))
+        .apply("CalculateAverage", ParDo.of(averagingFunction));
   }
 }
