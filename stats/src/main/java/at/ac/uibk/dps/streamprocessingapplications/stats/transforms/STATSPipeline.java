@@ -56,9 +56,9 @@ public class STATSPipeline<T> extends PTransform<PCollection<String>, PDone> {
 
                       @ProcessElement
                       public void processElement(
-                          @Element TaxiRide element, OutputReceiver<KV<Integer, TaxiRide>> out) {
+                          @Element TaxiRide element, OutputReceiver<KV<String, TaxiRide>> out) {
                         int key = count % 2;
-                        out.output(KV.of(key, element));
+                        out.output(KV.of(String.valueOf(key), element));
                         count++;
                       }
                     }))
