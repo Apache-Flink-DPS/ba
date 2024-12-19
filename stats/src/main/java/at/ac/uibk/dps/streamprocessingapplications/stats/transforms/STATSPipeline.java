@@ -1,6 +1,5 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 
-import at.ac.uibk.dps.streamprocessingapplications.shared.model.TaxiRide;
 import at.ac.uibk.dps.streamprocessingapplications.shared.sinks.StoreStringInDBSink;
 import java.util.List;
 import java.util.Objects;
@@ -55,10 +54,9 @@ public class STATSPipeline<T> extends PTransform<PCollection<String>, PDone> {
                       private int count = 0;
 
                       @ProcessElement
-                      public void processElement(
-                          @Element TaxiRide element, OutputReceiver<KV<String, TaxiRide>> out) {
+                      public void processElement(ProcessContext c) {
                         int key = count % 2;
-                        out.output(KV.of(String.valueOf(key), element));
+                        c.output(KV.of(String.valueOf(key), c.element()));
                         count++;
                       }
                     }))
