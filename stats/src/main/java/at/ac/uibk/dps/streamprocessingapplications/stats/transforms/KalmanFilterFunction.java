@@ -66,6 +66,6 @@ public class KalmanFilterFunction<T> extends DoFn<T, T> {
     previousEstimation.write(x1_currentEstimation);
     priorErrorCovariance.write(p1_currentErrorCovariance);
 
-    out.output(KV.of("", this.setter.apply(element, x1_currentEstimation)));
+    out.output(this.setter.apply(element, x1_currentEstimation));
   }
 }
