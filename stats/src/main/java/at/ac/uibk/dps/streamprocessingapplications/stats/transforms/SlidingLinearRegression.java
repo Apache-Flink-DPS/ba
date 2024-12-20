@@ -2,7 +2,6 @@ package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.beam.sdk.state.BagState;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -21,10 +20,7 @@ public class SlidingLinearRegression<T> extends DoFn<T, List<Double>> {
   }
 
   @ProcessElement
-  public void processElement(
-      @Element T element,
-      OutputReceiver<List<Double>> out,
-      @StateId("previousElements") BagState<Double> previousElements) {
+  public void processElement(@Element T element, OutputReceiver<List<Double>> out) {
 
     Double newValue = this.getter.apply(element);
     List<Double> pastElements = new ArrayList<>();
