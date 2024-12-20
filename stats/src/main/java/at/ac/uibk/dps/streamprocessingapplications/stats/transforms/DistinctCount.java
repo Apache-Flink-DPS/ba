@@ -22,7 +22,7 @@ public class DistinctCount<T> extends PTransform<PCollection<T>, PCollection<Lon
      */
     return input
         .apply(
-            "BatchVisAvg",
+            "BatchDist",
             ParDo.of(
                 new DoFn<T, Iterable<T>>() {
                   private List<T> buffer = new ArrayList<>();
