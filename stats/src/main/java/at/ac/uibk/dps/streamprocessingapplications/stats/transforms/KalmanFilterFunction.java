@@ -1,13 +1,8 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 
-import org.apache.beam.sdk.coders.DoubleCoder;
-import org.apache.beam.sdk.state.StateSpec;
-import org.apache.beam.sdk.state.StateSpecs;
-import org.apache.beam.sdk.state.ValueState;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.SerializableBiFunction;
 import org.apache.beam.sdk.transforms.SerializableFunction;
-import org.apache.beam.sdk.values.KV;
 
 public class KalmanFilterFunction<T> extends DoFn<T, T> {
 
@@ -15,14 +10,6 @@ public class KalmanFilterFunction<T> extends DoFn<T, T> {
   // https://github.com/dream-lab/riot-bench/blob/c86414f7f926ed5ae0fab756bb3d82fbfb6e5bf7/modules/tasks/src/main/resources/tasks_TAXI.properties
   private static final double q_processNoise = 0.125;
   private static final double r_sensorNoise = 0.32;
-
-  @StateId("previousEstimation")
-  private final StateSpec<ValueState<Double>> previousEstimationState =
-      StateSpecs.value(DoubleCoder.of());
-
-  @StateId("priorErrorCovariance")
-  private final StateSpec<ValueState<Double>> priorErrorCovarianceState =
-      StateSpecs.value(DoubleCoder.of());
 
   private SerializableFunction<T, Double> getter;
   private SerializableBiFunction<T, Double, T> setter;
@@ -36,21 +23,19 @@ public class KalmanFilterFunction<T> extends DoFn<T, T> {
   @ProcessElement
   public void processElement(
       @Element T element,
-      OutputReceiver<T> out,
-      @StateId("previousEstimation") ValueState<Double> previousEstimation,
-      @StateId("priorErrorCovariance") ValueState<Double> priorErrorCovariance) {
+      OutputReceiver<T> out) {
     final double z_measuredValue = this.getter.apply(element);
 
     // NOTE: conditional override of the values due to `NullPointerException`
     double x0_previousEstimation = 0.0;
     try {
-      x0_previousEstimation = previousEstimation.read();
+      x0_previousEstimation = 0.0;
     } catch (NullPointerException ignore) {
     }
 
     double p0_priorErrorCovariance = 0.0;
     try {
-      p0_priorErrorCovariance = priorErrorCovariance.read();
+      p0_priorErrorCovariance = 0.0;
     } catch (NullPointerException ignore) {
     }
 
@@ -61,10 +46,6 @@ public class KalmanFilterFunction<T> extends DoFn<T, T> {
     double x1_currentEstimation =
         x0_previousEstimation + k_kalmanGain * (z_measuredValue - x0_previousEstimation);
     p1_currentErrorCovariance = (1 - k_kalmanGain) * p1_currentErrorCovariance;
-
-    // Update estimate and covariance for next iteration
-    previousEstimation.write(x1_currentEstimation);
-    priorErrorCovariance.write(p1_currentErrorCovariance);
 
     out.output(this.setter.apply(element, x1_currentEstimation));
   }

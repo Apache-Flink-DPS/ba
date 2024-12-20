@@ -16,9 +16,6 @@ public class SlidingLinearRegression<T> extends DoFn<T, List<Double>> {
   private final int trainWindowSize;
   private final int predictionHorizonSize;
 
-  @StateId("previousElements")
-  private final StateSpec<BagState<Double>> previousElements = StateSpecs.bag();
-
   private SerializableFunction<T, Double> getter;
 
   public SlidingLinearRegression(
@@ -35,9 +32,7 @@ public class SlidingLinearRegression<T> extends DoFn<T, List<Double>> {
       @StateId("previousElements") BagState<Double> previousElements) {
 
     Double newValue = this.getter.apply(element);
-    List<Double> pastElements =
-        StreamSupport.stream(previousElements.read().spliterator(), false)
-            .collect(Collectors.toList());
+    List<Double> pastElements = new ArrayList<>();
 
     // Update `pastElements`
     pastElements.add(newValue);
