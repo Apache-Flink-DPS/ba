@@ -36,7 +36,7 @@ public class KalmanFilterFunction<T> extends DoFn<T, T> {
   @ProcessElement
   public void processElement(
       @Element T element,
-      OutputReceiver<KV<String, T>> out,
+      OutputReceiver<T> out,
       @StateId("previousEstimation") ValueState<Double> previousEstimation,
       @StateId("priorErrorCovariance") ValueState<Double> priorErrorCovariance) {
     final double z_measuredValue = this.getter.apply(element);
