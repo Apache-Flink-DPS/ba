@@ -1,5 +1,7 @@
 package at.ac.uibk.dps.streamprocessingapplications.stats.transforms;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
 
@@ -19,9 +21,25 @@ public class DistinctCount<T> extends PTransform<PCollection<T>, PCollection<Lon
      * Therefore, a pseudo mapping to the same key is performed.
      */
     return input
-        .apply(WithKeys.of(""))
-        .apply(GroupIntoBatches.ofSize(this.batchSize))
-        .apply(Values.create())
+        .apply(
+            "BatchVisAvg",
+            ParDo.of(
+                new DoFn<T, Iterable<T>>() {
+                  private List<T> buffer = new ArrayList<>();
+                  private int currentSize = 0;
+                  private final int batchSize = DistinctCount.this.batchSize;
+
+                  @ProcessElement
+                  public void processElement(ProcessContext c) {
+                    buffer.add(c.element());
+                    currentSize++;
+                    if (currentSize >= batchSize) {
+                      c.output(buffer);
+                      buffer.clear();
+                      currentSize = 0;
+                    }
+                  }
+                }))
         .apply(ParDo.of(this.distinctCountFunction));
   }
 }
