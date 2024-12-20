@@ -21,9 +21,7 @@ public class KalmanFilterFunction<T> extends DoFn<T, T> {
   }
 
   @ProcessElement
-  public void processElement(
-      @Element T element,
-      OutputReceiver<T> out) {
+  public void processElement(@Element T element, OutputReceiver<T> out) {
     final double z_measuredValue = this.getter.apply(element);
 
     // NOTE: conditional override of the values due to `NullPointerException`
