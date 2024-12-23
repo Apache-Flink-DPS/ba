@@ -13,6 +13,7 @@ import org.apache.beam.runners.flink.FlinkPipelineOptions;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
@@ -106,8 +107,23 @@ public class FlinkJob {
     PCollection<BlobReadEntry> blobRead =
         sourceDataMqtt.apply("Blob Read", ParDo.of(new BlobReadBeam(p_)));
 
+    PCollection<SourceEntry> sourceDataLoaded =
+        sourceData.apply(
+            "Loader",
+            ParDo.of(
+                new DoFn<SourceEntry, SourceEntry>() {
+                  @ProcessElement
+                  public void processElement(ProcessContext c) {
+                    SourceEntry element = c.element();
+                    for (int i = 0; i < 15; i++) {
+                      c.output(element);
+                    }
+                  }
+                }));
+
     PCollection<SenMlEntry> mlParseData =
-        sourceData.apply("SenML Parse", ParDo.of(new ParsePredictBeam(p_, dataSetType, isJson)));
+        sourceDataLoaded.apply(
+            "SenML Parse", ParDo.of(new ParsePredictBeam(p_, dataSetType, isJson)));
 
     PCollection<LinearRegressionEntry> linearRegression1 =
         mlParseData.apply(
