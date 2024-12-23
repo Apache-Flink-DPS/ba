@@ -68,7 +68,12 @@ public class LinearRegressionBeam1 extends DoFn<SenMlEntry, LinearRegressionEntr
 
     HashMap<String, String> map = new HashMap<>();
     map.put(AbstractTask.DEFAULT_KEY, obsVal);
-    Float res = linearRegressionPredictor.doTask(map);
+    Float res = new Float(0.0);
+    try {
+      res = linearRegressionPredictor.doTask(map);
+    } catch (Exception ignored) {
+    }
+
     if (l.isInfoEnabled()) l.info("res linearRegressionPredictor-" + res);
 
     if (res != null) {
