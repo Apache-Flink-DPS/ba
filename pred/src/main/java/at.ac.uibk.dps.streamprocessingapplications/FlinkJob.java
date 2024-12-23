@@ -115,7 +115,7 @@ public class FlinkJob {
                   @ProcessElement
                   public void processElement(ProcessContext c) {
                     SourceEntry element = c.element();
-                    for (int i = 0; i < 5; i++) {
+                    for (int i = 0; i < 15; i++) {
                       c.output(element);
                     }
                   }
