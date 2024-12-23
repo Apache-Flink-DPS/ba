@@ -33,7 +33,7 @@ public class PipelineBuilder {
                   @ProcessElement
                   public void processElement(ProcessContext c) {
                     String element = c.element();
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < 4; i++) {
                       c.output(element);
                     }
                   }
