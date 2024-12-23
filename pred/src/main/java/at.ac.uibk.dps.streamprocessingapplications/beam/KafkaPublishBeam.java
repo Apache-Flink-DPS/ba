@@ -3,9 +3,7 @@ package at.ac.uibk.dps.streamprocessingapplications.beam;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishEntry;
 import at.ac.uibk.dps.streamprocessingapplications.entity.MqttPublishInput;
 import at.ac.uibk.dps.streamprocessingapplications.kafka.MyKafkaProducer;
-import at.ac.uibk.dps.streamprocessingapplications.tasks.AbstractTask;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Properties;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -63,9 +61,11 @@ public class KafkaPublishBeam extends DoFn<MqttPublishInput, MqttPublishEntry> {
 
     if (l.isInfoEnabled()) l.info("MQTT result:{}", temp);
 
+    /*
     HashMap<String, String> map = new HashMap();
     map.put(AbstractTask.DEFAULT_KEY, String.valueOf(temp));
-    // myKafkaProducer.doTask(map);
+    myKafkaProducer.doTask(map);
+    */
     MqttPublishEntry publishEntry = new MqttPublishEntry(msgId, meta, obsVal);
     publishEntry.setArrivalTime(input.getArrivalTime());
     out.output(publishEntry);
