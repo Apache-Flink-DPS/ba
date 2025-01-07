@@ -13,6 +13,7 @@ import org.json.JSONObject;
 public class FitSenMLParserJSON {
   public static FitnessMeasurements parseSenMLPack(String senMLJsonArray) {
     JSONArray recordPack = new JSONArray(senMLJsonArray);
+    System.out.println("TOPRINT_PACK" + recordPack);
     if (recordPack.isEmpty()) {
       return new FitnessMeasurements();
     }
@@ -45,7 +46,7 @@ public class FitSenMLParserJSON {
             .collect(
                 Collectors.toMap(jsonObject -> jsonObject.getString("n"), JSONObject::toString));
     FitnessMeasurements res = buildFitnessMeasurementsFromMap(recordNameToRecordString);
-    System.out.println("BUILDDDDD" + res);
+    System.out.println("TOPRINT_recordnametostring" + recordNameToRecordString);
     return res;
   }
 

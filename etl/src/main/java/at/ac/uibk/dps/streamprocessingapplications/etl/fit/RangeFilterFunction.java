@@ -11,8 +11,6 @@ public class RangeFilterFunction
     implements SerializableFunction<FitnessMeasurements, FitnessMeasurements> {
 
   public FitnessMeasurements apply(FitnessMeasurements measurements) {
-    System.out.println(
-        "MEASUREMENTNTNTNNTNTNTNNTN--------------------------------_" + measurements);
     setNullIf(
         measurements::getAnkleAccelerationX,
         RangeFilterFunction::isAnkleAccelerationXOutOfRange,
