@@ -44,8 +44,9 @@ public class FitSenMLParserJSON {
                 })
             .collect(
                 Collectors.toMap(jsonObject -> jsonObject.getString("n"), JSONObject::toString));
-
-    return buildFitnessMeasurementsFromMap(recordNameToRecordString);
+    FitnessMeasurements res = buildFitnessMeasurementsFromMap(recordNameToRecordString);
+    System.out.println("BUILDDDDD" + res);
+    return res;
   }
 
   private static FitnessMeasurements buildFitnessMeasurementsFromMap(
