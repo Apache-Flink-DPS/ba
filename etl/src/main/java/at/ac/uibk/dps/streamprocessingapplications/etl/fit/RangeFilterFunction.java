@@ -11,6 +11,8 @@ public class RangeFilterFunction
     implements SerializableFunction<FitnessMeasurements, FitnessMeasurements> {
 
   public FitnessMeasurements apply(FitnessMeasurements measurements) {
+    System.out.println(
+        "MEASUREMENTNTNTNNTNTNTNNTN--------------------------------_" + measurements);
     setNullIf(
         measurements::getAnkleAccelerationX,
         RangeFilterFunction::isAnkleAccelerationXOutOfRange,
@@ -37,14 +39,14 @@ public class RangeFilterFunction
    */
   private static <T> void setNullIf(
       Supplier<Optional<T>> getter, Predicate<T> condition, Consumer<T> setter) {
-      getter
-          .get()
-          .ifPresent(
-              value -> {
-                if (condition.test(value)) {
-                  setter.accept(null);
-                }
-              });
+    getter
+        .get()
+        .ifPresent(
+            value -> {
+              if (condition.test(value)) {
+                setter.accept(null);
+              }
+            });
   }
 
   private static boolean isAnkleAccelerationXOutOfRange(Double acceleration) {
