@@ -169,9 +169,6 @@ public class FitnessMeasurements implements Serializable {
   }
 
   public Optional<Double> getAnkleAccelerationX() {
-    if (this.ankleAccelerationX == null) {
-      return Optional.empty();
-    }
     return Optional.ofNullable(this.ankleAccelerationX.getValue());
   }
 
@@ -180,9 +177,6 @@ public class FitnessMeasurements implements Serializable {
   }
 
   public Optional<Double> getAnkleAccelerationY() {
-    if (this.ankleAccelerationY == null) {
-      return Optional.empty();
-    }
     return Optional.ofNullable(this.ankleAccelerationY.getValue());
   }
 
