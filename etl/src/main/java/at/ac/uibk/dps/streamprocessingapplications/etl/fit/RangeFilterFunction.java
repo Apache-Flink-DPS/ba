@@ -37,14 +37,13 @@ public class RangeFilterFunction
    */
   private static <T> void setNullIf(
       Supplier<Optional<T>> getter, Predicate<T> condition, Consumer<T> setter) {
-    getter
-        .get()
-        .ifPresent(
-            value -> {
-              if (condition.test(value)) {
-                setter.accept(null);
-              }
-            });
+    Optional<T> optionalValue = Optional.ofNullable(getter.get()).orElse(Optional.empty());
+    optionalValue.ifPresent(
+        value -> {
+          if (condition.test(value)) {
+            setter.accept(null);
+          }
+        });
   }
 
   private static boolean isAnkleAccelerationXOutOfRange(Double acceleration) {
