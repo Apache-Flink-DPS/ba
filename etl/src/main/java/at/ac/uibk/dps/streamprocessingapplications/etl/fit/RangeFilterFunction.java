@@ -37,7 +37,6 @@ public class RangeFilterFunction
    */
   private static <T> void setNullIf(
       Supplier<Optional<T>> getter, Predicate<T> condition, Consumer<T> setter) {
-    if (getter != null) {
       getter
           .get()
           .ifPresent(
@@ -46,7 +45,6 @@ public class RangeFilterFunction
                   setter.accept(null);
                 }
               });
-    }
   }
 
   private static boolean isAnkleAccelerationXOutOfRange(Double acceleration) {
