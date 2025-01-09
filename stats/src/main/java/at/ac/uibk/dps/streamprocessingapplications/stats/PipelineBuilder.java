@@ -57,6 +57,18 @@ public class PipelineBuilder {
     pipeline
         .apply(new ReadSenMLSource("senml-cleaned"))
         .apply(
+            "Loader",
+            ParDo.of(
+                new DoFn<String, String>() {
+                  @ProcessElement
+                  public void processElement(ProcessContext c) {
+                    String element = c.element();
+                    for (int i = 0; i < 4; i++) {
+                      c.output(element);
+                    }
+                  }
+                }))
+        .apply(
             new STATSPipeline<>(
                 TypeDescriptor.of(FitnessMeasurements.class),
                 FitSenMLParserJSON::parseSenMLPack,
