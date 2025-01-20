@@ -27,7 +27,7 @@ public class WriteStringSink extends PTransform<PCollection<String>, PDone> {
             .withValueSerializer(StringSerializer.class)
             .values());*/
       input.apply(
-          "No-Op Transform",
+          "Write SenML strings to Kafka",
           ParDo.of(new DoFn<String, Void>() {
               @ProcessElement
               public void processElement(ProcessContext context) {
