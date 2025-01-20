@@ -1,7 +1,9 @@
 package at.ac.uibk.dps.streamprocessingapplications.shared.sinks;
 
 import org.apache.beam.sdk.io.kafka.KafkaIO;
+import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PDone;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -24,6 +26,14 @@ public class WriteStringSink extends PTransform<PCollection<String>, PDone> {
             .withTopic(this.topic)
             .withValueSerializer(StringSerializer.class)
             .values());*/
-    return PDone.in(input.getPipeline());
+      input.apply(
+          "No-Op Transform",
+          ParDo.of(new DoFn<String, Void>() {
+              @ProcessElement
+              public void processElement(ProcessContext context) {
+                  // Do nothing - this is a no-op
+              }
+          }));
+      return PDone.in(input.getPipeline());
   }
 }
