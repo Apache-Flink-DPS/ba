@@ -28,7 +28,7 @@ public class PipelineBuilder {
 
     PCollection<String> etl_strings =
         pipeline
-            .apply(new ReadSenMLSource("senml-source"))
+            .apply(new ReadSenMLSource("senml-cleaned"))
             .apply(
                 "Loader",
                 ParDo.of(
