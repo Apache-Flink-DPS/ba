@@ -17,12 +17,13 @@ public class WriteStringSink extends PTransform<PCollection<String>, PDone> {
 
   @Override
   public PDone expand(PCollection<String> input) {
-    return input.apply(
+    /*return input.apply(
         "Write SenML strings to Kafka",
         KafkaIO.<Object, String>write()
             .withBootstrapServers("kafka-cluster-kafka-bootstrap:9092")
             .withTopic(this.topic)
             .withValueSerializer(StringSerializer.class)
-            .values());
+            .values());*/
+    return PDone.in(input.getPipeline());
   }
 }
