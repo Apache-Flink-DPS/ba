@@ -7,6 +7,7 @@ import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import com.google.common.collect.ImmutableMap;
 
 public class ReadSenMLSource extends PTransform<PBegin, PCollection<String>> {
   String topic;
@@ -26,6 +27,8 @@ public class ReadSenMLSource extends PTransform<PBegin, PCollection<String>> {
                 .withTopic(this.topic)
                 .withKeyDeserializer(LongDeserializer.class)
                 .withValueDeserializer(StringDeserializer.class)
+                .updateConsumerProperties(
+                    ImmutableMap.of("auto.offset.reset", "latest"))
                 .withReadCommitted()
                 .withoutMetadata())
         .apply(Values.create());
